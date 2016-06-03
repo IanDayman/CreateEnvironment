@@ -1,0 +1,22 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio 14
+VisualStudioVersion = 14.0.25123.0
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{151D2E53-A2C4-4D7D-83FE-D05416EBD58E}") = "CreateEnvironment", "CreateEnvironment\CreateEnvironment.deployproj", "{5C29A106-7F79-4693-9932-505C628FD999}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{5C29A106-7F79-4693-9932-505C628FD999}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{5C29A106-7F79-4693-9932-505C628FD999}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{5C29A106-7F79-4693-9932-505C628FD999}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{5C29A106-7F79-4693-9932-505C628FD999}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+EndGlobal
