@@ -2,10 +2,294 @@
     "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#",
     "contentVersion": "1.0.0.0",
     "parameters": {
+        "CotsStorageType": {
+            "type": "string",
+            "defaultValue": "Standard_LRS",
+            "allowedValues": [
+                "Standard_LRS",
+                "Standard_ZRS",
+                "Standard_GRS",
+                "Standard_RAGRS",
+                "Premium_LRS"
+            ]
+        },
+        "CotsAppName": {
+            "type": "string",
+            "minLength": 1
+        },
+        "CotsAppAdminUserName": {
+            "type": "string",
+            "minLength": 1
+        },
+        "CotsAppAdminPassword": {
+            "type": "securestring"
+        },
+        "CotsAppWindowsOSVersion": {
+            "type": "string",
+            "defaultValue": "2012-R2-Datacenter",
+            "allowedValues": [
+                "2008-R2-SP1",
+                "2012-Datacenter",
+                "2012-R2-Datacenter",
+                "Windows-Server-Technical-Preview"
+            ]
+        },
+        "CotsAppNicName": {
+            "type": "string",
+            "minLength": 1
+        },
+        "CotsAppPIPDnsName": {
+            "type": "string",
+            "minLength": 1
+        },
+        "_artifactsLocation": {
+            "type": "string",
+            "metadata": {
+                "description": "Auto-generated container in staging storage account to receive post-build staging folder upload"
+            }
+        },
+        "_artifactsLocationSasToken": {
+            "type": "securestring",
+            "metadata": {
+                "description": "Auto-generated token to access _artifactsLocation"
+            }
+        }
     },
     "variables": {
+        "CotsStorageName": "[concat('CotsStorage', uniqueString(resourceGroup().id))]",
+        "CotsVNetPrefix": "10.0.0.0/16",
+        "CotsVNetSubnet1Name": "Subnet-1",
+        "CotsVNetSubnet1Prefix": "10.0.0.0/24",
+        "CotsVNetSubnet2Name": "Subnet-2",
+        "CotsVNetSubnet2Prefix": "10.0.1.0/24",
+        "CotsAppImagePublisher": "MicrosoftWindowsServer",
+        "CotsAppImageOffer": "WindowsServer",
+        "CotsAppOSDiskName": "CotsAppOSDisk",
+        "CotsAppVmSize": "Standard_D1",
+        "CotsAppVnetID": "[resourceId('Microsoft.Network/virtualNetworks', 'CotsVNet')]",
+        "CotsAppSubnetRef": "[concat(variables('CotsAppVnetID'), '/subnets/', variables('CotsVNetSubnet1Name'))]",
+        "CotsAppStorageAccountContainerName": "vhds",
+        "CotsAppNicName": "[concat(parameters('CotsAppName'), 'NetworkInterface')]",
+        "CotsAppNicVnetID": "[resourceId('Microsoft.Network/virtualNetworks', 'CotsVNet')]",
+        "CotsAppNicSubnetRef": "[concat(variables('CotsAppNicVnetID'), '/subnets/', variables('CotsVNetSubnet2Name'))]",
+        "CotsAppPIPName": "CotsAppPIP",
+        "CotsAppDSCConfigurationFunction": "CotsAppDSCConfiguration.ps1\\Main",
+        "CotsAppCustomScriptExtScriptFilePath": "CreateEnvironment/CustomScripts/CotsAppCustomScriptExt.ps1"
     },
     "resources": [
+        {
+            "name": "[variables('CotsStorageName')]",
+            "type": "Microsoft.Storage/storageAccounts",
+            "location": "[resourceGroup().location]",
+            "apiVersion": "2015-06-15",
+            "dependsOn": [ ],
+            "tags": {
+                "displayName": "CotsStorage"
+            },
+            "properties": {
+                "accountType": "[parameters('CotsStorageType')]"
+            }
+        },
+        {
+            "name": "CotsVNet",
+            "type": "Microsoft.Network/virtualNetworks",
+            "location": "[resourceGroup().location]",
+            "apiVersion": "2015-06-15",
+            "dependsOn": [ ],
+            "tags": {
+                "displayName": "CotsVNet"
+            },
+            "properties": {
+                "addressSpace": {
+                    "addressPrefixes": [
+                        "[variables('CotsVNetPrefix')]"
+                    ]
+                },
+                "subnets": [
+                    {
+                        "name": "[variables('CotsVNetSubnet1Name')]",
+                        "properties": {
+                            "addressPrefix": "[variables('CotsVNetSubnet1Prefix')]"
+                        }
+                    },
+                    {
+                        "name": "[variables('CotsVNetSubnet2Name')]",
+                        "properties": {
+                            "addressPrefix": "[variables('CotsVNetSubnet2Prefix')]"
+                        }
+                    }
+                ]
+            }
+        },
+        {
+            "name": "[variables('CotsAppNicName')]",
+            "type": "Microsoft.Network/networkInterfaces",
+            "location": "[resourceGroup().location]",
+            "apiVersion": "2015-06-15",
+            "dependsOn": [
+                "[concat('Microsoft.Network/virtualNetworks/', 'CotsVNet')]"
+            ],
+            "tags": {
+                "displayName": "CotsAppNic"
+            },
+            "properties": {
+                "ipConfigurations": [
+                    {
+                        "name": "ipconfig1",
+                        "properties": {
+                            "privateIPAllocationMethod": "Dynamic",
+                            "subnet": {
+                                "id": "[variables('CotsAppSubnetRef')]"
+                            }
+                        }
+                    }
+                ]
+            }
+        },
+        {
+            "name": "[parameters('CotsAppName')]",
+            "type": "Microsoft.Compute/virtualMachines",
+            "location": "[resourceGroup().location]",
+            "apiVersion": "2015-06-15",
+            "dependsOn": [
+                "[concat('Microsoft.Storage/storageAccounts/', variables('CotsStorageName'))]",
+                "[concat('Microsoft.Network/networkInterfaces/', variables('CotsAppNicName'))]"
+            ],
+            "tags": {
+                "displayName": "CotsApp"
+            },
+            "properties": {
+                "hardwareProfile": {
+                    "vmSize": "[variables('CotsAppVmSize')]"
+                },
+                "osProfile": {
+                    "computerName": "[parameters('CotsAppName')]",
+                    "adminUsername": "[parameters('CotsAppAdminUsername')]",
+                    "adminPassword": "[parameters('CotsAppAdminPassword')]"
+                },
+                "storageProfile": {
+                    "imageReference": {
+                        "publisher": "[variables('CotsAppImagePublisher')]",
+                        "offer": "[variables('CotsAppImageOffer')]",
+                        "sku": "[parameters('CotsAppWindowsOSVersion')]",
+                        "version": "latest"
+                    },
+                    "osDisk": {
+                        "name": "CotsAppOSDisk",
+                        "vhd": {
+                            "uri": "[concat('http://', variables('CotsStorageName'), '.blob.core.windows.net/', variables('CotsAppStorageAccountContainerName'), '/', variables('CotsAppOSDiskName'), '.vhd')]"
+                        },
+                        "caching": "ReadWrite",
+                        "createOption": "FromImage"
+                    }
+                },
+                "networkProfile": {
+                    "networkInterfaces": [
+                        {
+                            "id": "[resourceId('Microsoft.Network/networkInterfaces', variables('CotsAppNicName'))]"
+                        }
+                    ]
+                }
+            },
+            "resources": [
+                {
+                    "name": "CotsAppDSC",
+                    "type": "extensions",
+                    "location": "[resourceGroup().location]",
+                    "apiVersion": "2015-06-15",
+                    "dependsOn": [
+                        "[concat('Microsoft.Compute/virtualMachines/', parameters('CotsAppName'))]"
+                    ],
+                    "tags": {
+                        "displayName": "CotsAppDSC"
+                    },
+                    "properties": {
+                        "publisher": "Microsoft.Powershell",
+                        "type": "DSC",
+                        "typeHandlerVersion": "2.9",
+                        "autoUpgradeMinorVersion": true,
+                        "settings": {
+                            "modulesUrl": "[concat(parameters('_artifactsLocation'), '/', 'dsc.zip')]",
+                            "sasToken": "[parameters('_artifactsLocationSasToken')]",
+                            "configurationFunction": "[variables('CotsAppDSCConfigurationFunction')]",
+                            "properties": {
+                                "nodeName": "[parameters('CotsAppName')]"
+                            }
+                        },
+                        "protectedSettings": { }
+                    }
+                },
+                {
+                    "name": "CotsAppCustomScriptExt",
+                    "type": "extensions",
+                    "location": "[resourceGroup().location]",
+                    "apiVersion": "2015-06-15",
+                    "dependsOn": [
+                        "[concat('Microsoft.Compute/virtualMachines/', parameters('CotsAppName'))]"
+                    ],
+                    "tags": {
+                        "displayName": "CotsAppCustomScriptExt"
+                    },
+                    "properties": {
+                        "publisher": "Microsoft.Compute",
+                        "type": "CustomScriptExtension",
+                        "typeHandlerVersion": "1.4",
+                        "autoUpgradeMinorVersion": true,
+                        "settings": {
+                            "fileUris": [
+                                "[concat(parameters('_artifactsLocation'), '/', variables('CotsAppCustomScriptExtScriptFilePath'), parameters('_artifactsLocationSasToken'))]"
+                            ],
+                            "commandToExecute": "[concat('powershell -ExecutionPolicy Unrestricted -File ', variables('CotsAppCustomScriptExtScriptFilePath'))]"
+                        }
+                    }
+                }
+            ]
+        },
+        {
+            "name": "[parameters('CotsAppNicName')]",
+            "type": "Microsoft.Network/networkInterfaces",
+            "location": "[resourceGroup().location]",
+            "apiVersion": "2015-06-15",
+            "dependsOn": [
+                "[concat('Microsoft.Network/virtualNetworks/', 'CotsVNet')]",
+                "[concat('Microsoft.Network/publicIPAddresses/', variables('CotsAppPIPName'))]"
+            ],
+            "tags": {
+                "displayName": "CotsAppNic"
+            },
+            "properties": {
+                "ipConfigurations": [
+                    {
+                        "name": "ipconfig1",
+                        "properties": {
+                            "privateIPAllocationMethod": "Dynamic",
+                            "subnet": {
+                                "id": "[variables('CotsAppNicSubnetRef')]"
+                            },
+                            "publicIPAddress": {
+                                "id": "[resourceId('Microsoft.Network/publicIPAddresses', variables('CotsAppPIPName'))]"
+                            }
+                        }
+                    }
+                ]
+            }
+        },
+        {
+            "name": "[variables('CotsAppPIPName')]",
+            "type": "Microsoft.Network/publicIPAddresses",
+            "location": "[resourceGroup().location]",
+            "apiVersion": "2015-06-15",
+            "dependsOn": [ ],
+            "tags": {
+                "displayName": "CotsAppPIP"
+            },
+            "properties": {
+                "publicIPAllocationMethod": "Dynamic",
+                "dnsSettings": {
+                    "domainNameLabel": "[parameters('CotsAppPIPDnsName')]"
+                }
+            }
+        }
     ],
     "outputs": {
     }

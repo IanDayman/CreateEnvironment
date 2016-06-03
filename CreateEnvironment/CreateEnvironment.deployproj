@@ -29,12 +29,14 @@
     <Folder Include="Templates\" />
   </ItemGroup>
   <ItemGroup>
+    <Content Include="CustomScripts\CotsAppCustomScriptExt.ps1" />
     <None Include="Deployment.targets">
       <Visible>False</Visible>
     </None>
     <Content Include="Scripts\Deploy-AzureResourceGroup.ps1" />
     <Content Include="Templates\azuredeploy.json" />
     <Content Include="Templates\azuredeploy.parameters.json" />
+    <Content Include="DSC\CotsAppDSCConfiguration.ps1" />
   </ItemGroup>
   <Target Name="GetReferenceAssemblyPaths" />
 </Project>
