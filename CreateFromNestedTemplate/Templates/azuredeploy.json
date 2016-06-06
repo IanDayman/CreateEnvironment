@@ -1,0 +1,50 @@
+﻿{
+    "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#",
+    "contentVersion": "1.0.0.0",
+    "parameters": {
+    },
+    "variables": {
+    },
+  "resources": [
+    {
+      "apiVersion": "2015-01-01",
+      "location": "North Europe",
+      "name": "mytemplate",
+      "type": "Microsoft.Resources/deployments",
+      "properties": {
+        "mode": "Incremental",
+        "templateLink": {
+          "uri": "https://github.com/IanDayman/CreateEnvironment/blob/master/CreateEnvironment/Templates/azuredeploy.json",
+          "contentVersion": "1.0.0.0"
+        },
+        "parameters": {
+          "CotsAppName": {
+            "value": "ordsurv"
+          },
+          "CotsAppAdminUserName": {
+            "value": "ian"
+          },
+
+          "CotsAppAdminPassword": {
+            "reference": {
+              "keyVault": {
+                "id": "/subscriptions/22623ac3-2b65-47ec-bab3-9750a5881158/resourceGroups/vaults/providers/Microsoft.KeyVault/vaults/ordSurv"
+              },
+              "secretName": "p1"
+            }
+          },
+          "ordsurvpipDnsName": {
+            "value": "ordsurv"
+          },
+          "CotsAppNicName": {
+            "value": "ordsurv"
+          }
+        }
+
+
+        }
+    }
+  ],
+    "outputs": {
+    }
+}
