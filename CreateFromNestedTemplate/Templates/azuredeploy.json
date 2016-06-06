@@ -14,7 +14,7 @@
       "properties": {
         "mode": "Incremental",
         "templateLink": {
-          "uri": "https://github.com/IanDayman/CreateEnvironment/blob/master/CreateEnvironment/Templates/azuredeploy.json",
+          "uri": "https://raw.githubusercontent.com/IanDayman/CreateEnvironment/master/CreateEnvironment/Templates/azuredeploy.json",
           "contentVersion": "1.0.0.0"
         },
         "parameters": {
