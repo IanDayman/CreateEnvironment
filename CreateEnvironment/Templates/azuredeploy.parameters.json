@@ -2,5 +2,25 @@
     "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentParameters.json#",
     "contentVersion": "1.0.0.0",
     "parameters": {
+        "CotsAppName": {
+            "value": "ordsurv"
+        },
+        "CotsAppAdminUserName": {
+            "value": "ian"
+        },
+        "CotsAppNicName": {
+            "value": "ordsurv"
+        },
+        "CotsAppPIPDnsName": {
+            "value": "ordsurv"
+        },
+        "CotsAppAdminPassword": {
+            "reference": {
+                "keyVault": {
+                    "id": "/subscriptions/22623ac3-2b65-47ec-bab3-9750a5881158/resourceGroups/vaults/providers/Microsoft.KeyVault/vaults/ordSurv"
+                },
+                "secretName": "p1"
+            }
+        }
     }
 }

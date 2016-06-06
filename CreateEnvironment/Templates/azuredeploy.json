@@ -56,7 +56,7 @@
         }
     },
     "variables": {
-        "CotsStorageName": "[concat('CotsStorage', uniqueString(resourceGroup().id))]",
+        "CotsStorageName": "[concat('ordsurv', uniqueString(resourceGroup().id))]",
         "CotsVNetPrefix": "10.0.0.0/16",
         "CotsVNetSubnet1Name": "Subnet-1",
         "CotsVNetSubnet1Prefix": "10.0.0.0/24",
