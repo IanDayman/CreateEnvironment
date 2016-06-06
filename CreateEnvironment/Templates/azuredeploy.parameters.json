@@ -8,9 +8,7 @@
         "CotsAppAdminUserName": {
             "value": "ian"
         },
-        //"CotsAppNicName": {
-        //    "value": "ordsurv"
-        //},
+
         "CotsAppAdminPassword": {
             "reference": {
                 "keyVault": {
@@ -20,6 +18,9 @@
             }
         },
         "ordsurvpipDnsName": {
+            "value": "ordsurv"
+        },
+        "CotsAppNicName": {
             "value": "ordsurv"
         }
     }
