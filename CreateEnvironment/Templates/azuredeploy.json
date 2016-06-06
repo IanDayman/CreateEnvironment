@@ -38,10 +38,6 @@
             "type": "string",
             "minLength": 1
         },
-        "CotsAppPIPDnsName": {
-            "type": "string",
-            "minLength": 1
-        },
         "_artifactsLocation": {
             "type": "string",
             "metadata": {
@@ -252,22 +248,6 @@
                         }
                     }
                 ]
-            }
-        },
-        {
-            "name": "[variables('CotsAppPIPName')]",
-            "type": "Microsoft.Network/publicIPAddresses",
-            "location": "[resourceGroup().location]",
-            "apiVersion": "2015-06-15",
-            "dependsOn": [ ],
-            "tags": {
-                "displayName": "CotsAppPIP"
-            },
-            "properties": {
-                "publicIPAllocationMethod": "Dynamic",
-                "dnsSettings": {
-                    "domainNameLabel": "[parameters('CotsAppPIPDnsName')]"
-                }
             }
         },
         {
