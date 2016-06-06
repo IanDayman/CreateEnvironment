@@ -127,35 +127,6 @@
             }
         },
         {
-            "name": "[variables('CotsAppNicName')]",
-            "type": "Microsoft.Network/networkInterfaces",
-            "location": "[resourceGroup().location]",
-            "apiVersion": "2015-06-15",
-            "dependsOn": [
-                "[concat('Microsoft.Network/virtualNetworks/', 'CotsVNet')]",
-                "[concat('Microsoft.Network/publicIPAddresses/', variables('ordsurvpipName'))]"
-            ],
-            "tags": {
-                "displayName": "CotsAppNic"
-            },
-            "properties": {
-                "ipConfigurations": [
-                    {
-                        "name": "ipconfig1",
-                        "properties": {
-                            "privateIPAllocationMethod": "Dynamic",
-                            "subnet": {
-                                "id": "[variables('CotsAppSubnetRef')]"
-                            },
-                            "publicIPAddress": {
-                                "id": "[resourceId('Microsoft.Network/publicIPAddresses', variables('ordsurvpipName'))]"
-                            }
-                        }
-                    }
-                ]
-            }
-        },
-        {
             "name": "[parameters('CotsAppName')]",
             "type": "Microsoft.Compute/virtualMachines",
             "location": "[resourceGroup().location]",
