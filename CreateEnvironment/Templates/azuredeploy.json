@@ -38,18 +38,18 @@
             "type": "string",
             "minLength": 1
         },
-        "_artifactsLocation": {
-            "type": "string",
-            "metadata": {
-                "description": "Auto-generated container in staging storage account to receive post-build staging folder upload"
-            }
-        },
-        "_artifactsLocationSasToken": {
-            "type": "securestring",
-            "metadata": {
-                "description": "Auto-generated token to access _artifactsLocation"
-            }
-        },
+        //"_artifactsLocation": {
+        //    "type": "string",
+        //    "metadata": {
+        //        "description": "Auto-generated container in staging storage account to receive post-build staging folder upload"
+        //    }
+        //},
+        //"_artifactsLocationSasToken": {
+        //    "type": "securestring",
+        //    "metadata": {
+        //        "description": "Auto-generated token to access _artifactsLocation"
+        //    }
+        //},
         "ordsurvpipDnsName": {
             "type": "string",
             "minLength": 1
