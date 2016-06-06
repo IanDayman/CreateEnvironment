@@ -72,7 +72,6 @@
         "CotsAppNicName": "[concat(parameters('CotsAppName'), 'NetworkInterface')]",
         "CotsAppNicVnetID": "[resourceId('Microsoft.Network/virtualNetworks', 'CotsVNet')]",
         "CotsAppNicSubnetRef": "[concat(variables('CotsAppNicVnetID'), '/subnets/', variables('CotsVNetSubnet2Name'))]",
-        "CotsAppPIPName": "CotsAppPIP",
         "CotsAppDSCConfigurationFunction": "CotsAppDSCConfiguration.ps1\\Main",
         "CotsAppCustomScriptExtScriptFilePath": "CreateEnvironment/CustomScripts/CotsAppCustomScriptExt.ps1",
         "ordsurvpipName": "ordsurvpip"
@@ -226,10 +225,10 @@
             "type": "Microsoft.Network/networkInterfaces",
             "location": "[resourceGroup().location]",
             "apiVersion": "2015-06-15",
-            "dependsOn": [
-                "[concat('Microsoft.Network/virtualNetworks/', 'CotsVNet')]",
-                "[concat('Microsoft.Network/publicIPAddresses/', variables('CotsAppPIPName'))]"
-            ],
+          "dependsOn": [
+            "[concat('Microsoft.Network/virtualNetworks/', 'CotsVNet')]",
+            "[concat('Microsoft.Network/publicIPAddresses/', variables('ordsurvpipName'))]"
+          ],
             "tags": {
                 "displayName": "CotsAppNic"
             },
@@ -242,9 +241,9 @@
                             "subnet": {
                                 "id": "[variables('CotsAppNicSubnetRef')]"
                             },
-                            "publicIPAddress": {
-                                "id": "[resourceId('Microsoft.Network/publicIPAddresses', variables('CotsAppPIPName'))]"
-                            }
+                          "publicIPAddress": {
+                            "id": "[resourceId('Microsoft.Network/publicIPAddresses', variables('ordsurvpipName'))]"
+                          }
                         }
                     }
                 ]
